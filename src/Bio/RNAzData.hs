@@ -26,7 +26,6 @@ data RNAzOutput = RNAzOutput
   }
   deriving (Show, Eq)
 
-
 data RNAzResult = RNAzResult
   { header :: String,
     resultSequence :: String,
