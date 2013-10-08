@@ -2,7 +2,8 @@
 --   For more information on smiles strings consult: <http://meme.nbcr.net/meme/>
 
 module Bio.RNAzData where
-
+--import Biobase.RNA
+    
 -- | 
 data RNAzOutput = RNAzOutput
   { version :: String,
@@ -20,14 +21,22 @@ data RNAzOutput = RNAzOutput
     svmDecisionValue :: Double,
     svmRNAClassProbability :: Double,
     prediction :: String,
-    rnazResults :: [RNAzResult]   
+    rnazResults :: [RNAzResult],
+    rnazConsensus :: RNAzConsensus
   }
   deriving (Show, Eq)
 
 
 data RNAzResult = RNAzResult
   { header :: String,
-    sequence :: String,
-    mfe :: Double,
+    resultSequence :: String,
+    dotBracket :: String,         
+    minimumFreeEnergy :: Double
   }
   deriving (Show, Eq)
+
+data RNAzConsensus = RNAzConsensus
+  { consensusSequence :: String,
+    consensusDotBracket :: String         
+  }
+  deriving (Show, Eq)           
