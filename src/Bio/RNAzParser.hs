@@ -2,9 +2,10 @@
 
 -- | Parse smiles strings
 --   For more information on smiles strings consult: <http://>
-module Bio.RNAz (parseRNAzOutput,
-                 module Bio.RNAzData
-                ) where
+module Bio.RNAzParser (
+                       parseRNAzOutput,
+                       module Bio.RNAzData
+                      ) where
 
 import Bio.RNAzData
 --import Biobase.RNA
@@ -121,6 +122,16 @@ parseRNAzConsensus = do
   dotBracket <- many1 (oneOf "().,")
   skipMany1 space
   skipMany1 anyChar
-  eof
-       
+  eof   
   return $ RNAzConsensus consensusSequence dotBracket
+
+-- | Parser for RNAz output files
+getRNAzOutput filePath = let
+        fp = filePath
+        doParseLine' = parse parseRNAzOutput "parseRNAzOutput"
+        doParseLine l = case (doParseLine' l) of
+            Right x -> x
+            Left _  -> error "Failed to parse line"
+    in do
+        fileContent <- liftM lines $ readFile fp
+        return $ map doParseLine' fileContent
