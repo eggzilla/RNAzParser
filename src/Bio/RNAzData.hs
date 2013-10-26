@@ -20,6 +20,8 @@ data RNAzOutput = RNAzOutput
     combinationsPair :: Double,
     meanZScore :: Double,
     structureConservationIndex :: Double,
+    backgroundModel :: String,
+    decisionModel :: String,
     svmDecisionValue :: Double,
     svmRNAClassProbability :: Double,
     prediction :: String,
