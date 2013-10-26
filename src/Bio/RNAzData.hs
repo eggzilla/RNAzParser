@@ -11,6 +11,8 @@ data RNAzOutput = RNAzOutput
     columnNumber :: Int,
     readingDirection :: String,
     meanPairwiseIdentity :: Double,
+    shannonEntropy :: Double,
+    gcContent :: Double,
     meanSingleSequenceMinimumFreeEnergy :: Double,
     consensusMinimumFreeEnergy :: Double,
     energyContribution :: Double,
