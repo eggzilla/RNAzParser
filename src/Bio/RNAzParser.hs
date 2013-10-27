@@ -3,7 +3,7 @@
 -- | Parse smiles strings
 --   For more information on smiles strings consult: <http://>
 module Bio.RNAzParser (
-                       parseRNAzOutput,
+                       getRNAzOutput,
                        module Bio.RNAzData
                       ) where
 
@@ -22,22 +22,22 @@ readInt = read
 
 parseRNAzOutput :: GenParser Char st RNAzOutput
 parseRNAzOutput = do
-  skipMany1 space
-  skipMany1 (char '#')
-  skipMany1 space
-  skipMany1 (string "RNAz" )
-  skipMany1 space
+  char '\n'
+  many1 (oneOf "# ")
+  string "RNAz"
+  space
   version <- many1 (noneOf " ")
-  skipMany1 space
-  skipMany1 (char '#')
-  skipMany1 space
-  skipMany1 newline
-  skipMany1 space
-  skipMany1 newline
+  space
+  space
+  many1 (char '#')
+  newline  
+  space
   sequences <- parseRNAzIntField "Sequences:"
   columns <- parseRNAzIntField "Columns:"
   readingDirection <- parseRNAzStringField "Reading direction:"
   meanPairwiseIdentity <- parseRNAzDoubleField "Mean pairwise identity:"
+  shannonEntropy <- parseRNAzDoubleField "Shannon entropy:" 
+  gcContent <- parseRNAzDoubleField "G+C content:"
   meanSingleSequenceMFE <- parseRNAzDoubleField "Mean single sequence MFE:"
   consensusMFE <- parseRNAzDoubleField "Consensus MFE:"
   energyContribution <- parseRNAzDoubleField "Energy contribution:"
@@ -45,93 +45,105 @@ parseRNAzOutput = do
   combinationsPair <- parseRNAzDoubleField "Combinations/Pair:"
   meanZScore <- parseRNAzDoubleField "Mean z-score:"
   structureConservationIndex <- parseRNAzDoubleField "Structure conservation index:"
+  backgroundModel <- parseRNAzStringField "Background model:"
+  decisionModel <- parseRNAzStringField "Decision model:"
   svmDecisionValue <-  parseRNAzDoubleField "SVM decision value:"
   svmRNAClassProbability <- parseRNAzDoubleField "SVM RNA-class probability:"
   prediction <- parseRNAzStringField "Prediction:"
-  skipMany1 space
-  skipMany1 (char '#')
-  rnaZResults  <- many1 parseRNAzResult
+  space
+  many1 (char '#')
+  newline
+  rnaZResults  <- many1 (try parseRNAzResult)
   rnaZConsensus <- parseRNAzConsensus         
-  return $ RNAzOutput version sequences columns readingDirection meanPairwiseIdentity meanSingleSequenceMFE consensusMFE energyContribution covarianceContribution combinationsPair meanZScore structureConservationIndex svmDecisionValue svmRNAClassProbability prediction rnaZResults rnaZConsensus
+  return $ RNAzOutput version sequences columns readingDirection meanPairwiseIdentity shannonEntropy gcContent meanSingleSequenceMFE consensusMFE energyContribution covarianceContribution combinationsPair meanZScore structureConservationIndex  backgroundModel decisionModel svmDecisionValue svmRNAClassProbability prediction rnaZResults rnaZConsensus
 
 parseRNAzDoubleField :: String -> GenParser Char st Double
 parseRNAzDoubleField fieldname = do
-  skipMany1 space
-  skipMany1 (string fieldname)
-  skipMany1 space
+  optional space
+  string fieldname
+  many1 space
   double <- (many1 (noneOf " ")) 
-  skipMany1 space
-  skipMany1 newline
+  space
   return $ (readDouble double)
             
-
 parseRNAzStringField :: String -> GenParser Char st String
 parseRNAzStringField fieldname = do
-  skipMany1 space
-  skipMany1 (string fieldname)
-  skipMany1 space
-  string <- many1 (noneOf " ")
-  skipMany1 space
-  skipMany1 newline
+  optional space
+  string fieldname
+  space
+  string <- many1 (noneOf "\n")
+  space
   return $ string          
 
 parseRNAzIntField :: String -> GenParser Char st Int
 parseRNAzIntField fieldname = do
-  skipMany1 space
-  skipMany1 (string fieldname)
-  skipMany1 space
+  optional space
+  string fieldname
+  space
   int <- many1 (noneOf " ")
-  skipMany1 space
-  skipMany1 newline
+  space
   return $ (readInt int)
          
 parseRNAzResult :: GenParser Char st RNAzResult
 parseRNAzResult = do
-  skipMany1 space
-  skipMany1 newline
-  skipMany1 space
+  space
   header <- many1 (noneOf "\n")
-  skipMany1 newline
-  skipMany1 space
-  resultSequence <- many1 (oneOf "ATUGCatugc")
-  skipMany1 space                  
-  skipMany1 newline
-  skipMany1 space          
+  many1 space
+  resultSequence <- many1 (oneOf "ATUGCatugc")         
+  newline        
   dotBracket <- many1 (oneOf "().,")
-  skipMany1 space
+  space
   char ('(')
-  skipMany1 space
-  mfe <- many1 (noneOf " ")      
-  skipMany1 space
+  space
+  mfe <- many1 (noneOf ",")
+  char ','
+  space
+  string ("z-score")
+  space
+  char '='
+  space
+  zscore <- many1 (noneOf ",")
+  char ','
+  space
+  char 'R'
   char (')')
-  return $ RNAzResult header resultSequence dotBracket (readDouble mfe)
+  return $ RNAzResult header resultSequence dotBracket (readDouble mfe) (readDouble zscore)
          
 parseRNAzConsensus :: GenParser Char st RNAzConsensus
 parseRNAzConsensus = do
-  skipMany1 space
-  skipMany1 newline
-  skipMany1 space
+  space
   string (">consensus")
-  skipMany1 space       
-  skipMany1 newline
-  skipMany1 space
-  consensusSequence <- many1 (oneOf "ATUGCatugc")
-  skipMany1 space                  
-  skipMany1 newline
-  skipMany1 space          
+  many1 space
+  consensusSequence <- many1 (oneOf "ATUGCatugc")                 
+  newline          
   dotBracket <- many1 (oneOf "().,")
-  skipMany1 space
-  skipMany1 anyChar
+  space
+  char '('
+  many1 (noneOf " ")
+  space
+  char '='
+  space
+  many1 (noneOf " ")
+  space
+  char '+'
+  many1 space
+  many1 (noneOf ")")
+  char ')'
+  space
+  newline
   eof   
   return $ RNAzConsensus consensusSequence dotBracket
 
 -- | Parser for RNAz output files
-getRNAzOutput filePath = let
-        fp = filePath
-        doParseLine' = parse parseRNAzOutput "parseRNAzOutput"
-        doParseLine l = case (doParseLine' l) of
-            Right x -> x
-            Left _  -> error "Failed to parse line"
-    in do
-        fileContent <- liftM lines $ readFile fp
-        return $ map doParseLine' fileContent
+--getRNAzOutput :: [Char] -> Either ParseError RNAzOutput
+--getRNAzOutput filePath = let
+--        fp = filePath
+--        doParseLine' = parse parseRNAzOutput "parseRNAzOutput"
+--        doParseLine l = case (doParseLine' l) of
+--            Right x -> x
+--            Left _  -> error "Failed to parse line"
+--    in do
+--        --fileContent <- liftM lines $ readFile fp
+--        fileContent <- readFile fp
+--        return doParseLine' fileContent
+getRNAzOutput input = parse parseRNAzOutput "parseRNAzOutput" input
