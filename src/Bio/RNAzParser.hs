@@ -134,16 +134,10 @@ parseRNAzConsensus = do
   eof   
   return $ RNAzConsensus consensusSequence dotBracket
 
--- | Parser for RNAz output files
---getRNAzOutput :: [Char] -> Either ParseError RNAzOutput
---getRNAzOutput filePath = let
---        fp = filePath
---        doParseLine' = parse parseRNAzOutput "parseRNAzOutput"
---        doParseLine l = case (doParseLine' l) of
---            Right x -> x
---            Left _  -> error "Failed to parse line"
---    in do
---        --fileContent <- liftM lines $ readFile fp
---        fileContent <- readFile fp
---        return doParseLine' fileContent
+
+-- | parse RNAzOutput from input string
 getRNAzOutput input = parse parseRNAzOutput "parseRNAzOutput" input
+
+-- | parse from input filePath                      
+parseRNAz :: String -> IO (Either ParseError RNAzOutput)                  
+parseRNAz filePath = parseFromFile parseRNAzOutput filePath
