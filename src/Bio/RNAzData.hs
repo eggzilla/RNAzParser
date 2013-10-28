@@ -1,10 +1,11 @@
--- | This module contains a hierarchical data structure for smiles strings
---   For more information on smiles strings consult: <http://meme.nbcr.net/meme/>
+-- | This module contains a hierarchical data structure for
+--   RNAz output
+--   For more information on RNAz consult: <http://www.tbi.univie.ac.at/~wash/RNAz/>
 
 module Bio.RNAzData where
 --import Biobase.RNA
     
--- | 
+-- | All elements of RNAz output are contained in this datatype 
 data RNAzOutput = RNAzOutput
   { version :: String,
     sequenceNumber :: Int,
@@ -30,14 +31,17 @@ data RNAzOutput = RNAzOutput
   }
   deriving (Show, Eq)
 
+-- | Datatype contains all result elements for each member of the input alignment            
 data RNAzResult = RNAzResult
   { header :: String,
     resultSequence :: String,
     dotBracket :: String,         
-    minimumFreeEnergy :: Double
+    minimumFreeEnergy :: Double,
+    zScore :: Double
   }
   deriving (Show, Eq)
 
+-- | Datatype contains all elements for the consenus result of input alignment
 data RNAzConsensus = RNAzConsensus
   { consensusSequence :: String,
     consensusDotBracket :: String         

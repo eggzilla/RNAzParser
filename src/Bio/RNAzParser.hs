@@ -1,7 +1,7 @@
 {-# LANGUAGE Arrows #-}
 
--- | Parse smiles strings
---   For more information on smiles strings consult: <http://>
+-- | Parse RNAz output
+--   For more information on RNAz consult: <http://www.tbi.univie.ac.at/~wash/RN 
 module Bio.RNAzParser (
                        getRNAzOutput,
                        module Bio.RNAzData
@@ -20,6 +20,7 @@ readDouble = read
 readInt :: String -> Int
 readInt = read
 
+-- | Parse the input as RNAzOutput datatype
 parseRNAzOutput :: GenParser Char st RNAzOutput
 parseRNAzOutput = do
   char '\n'
@@ -57,6 +58,7 @@ parseRNAzOutput = do
   rnaZConsensus <- parseRNAzConsensus         
   return $ RNAzOutput version sequences columns readingDirection meanPairwiseIdentity shannonEntropy gcContent meanSingleSequenceMFE consensusMFE energyContribution covarianceContribution combinationsPair meanZScore structureConservationIndex  backgroundModel decisionModel svmDecisionValue svmRNAClassProbability prediction rnaZResults rnaZConsensus
 
+-- | Parse a RNAz field containing a Double 
 parseRNAzDoubleField :: String -> GenParser Char st Double
 parseRNAzDoubleField fieldname = do
   optional space
@@ -65,7 +67,8 @@ parseRNAzDoubleField fieldname = do
   double <- (many1 (noneOf " ")) 
   space
   return $ (readDouble double)
-            
+
+-- | Parse a RNAz field containing a String         
 parseRNAzStringField :: String -> GenParser Char st String
 parseRNAzStringField fieldname = do
   optional space
@@ -75,6 +78,7 @@ parseRNAzStringField fieldname = do
   space
   return $ string          
 
+-- | Parse a RNAz field containing a Int          
 parseRNAzIntField :: String -> GenParser Char st Int
 parseRNAzIntField fieldname = do
   optional space
@@ -83,7 +87,8 @@ parseRNAzIntField fieldname = do
   int <- many1 (noneOf " ")
   space
   return $ (readInt int)
-         
+
+-- | Parse a RNAz result        
 parseRNAzResult :: GenParser Char st RNAzResult
 parseRNAzResult = do
   space
@@ -108,7 +113,8 @@ parseRNAzResult = do
   char 'R'
   char (')')
   return $ RNAzResult header resultSequence dotBracket (readDouble mfe) (readDouble zscore)
-         
+
+-- | Parse the consenus of RNAz results         
 parseRNAzConsensus :: GenParser Char st RNAzConsensus
 parseRNAzConsensus = do
   space
@@ -133,8 +139,7 @@ parseRNAzConsensus = do
   newline
   eof   
   return $ RNAzConsensus consensusSequence dotBracket
-
-
+         
 -- | parse RNAzOutput from input string
 getRNAzOutput input = parse parseRNAzOutput "parseRNAzOutput" input
 
