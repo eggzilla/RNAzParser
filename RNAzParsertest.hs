@@ -29,5 +29,5 @@ main = do
 
   -- read RNAz outputfile
   input_file_content <- readFile input_file                       
-  print (fromLeft (getRNAzOutput input_file_content))
+  print (getRNAzOutput input_file_content)
   
