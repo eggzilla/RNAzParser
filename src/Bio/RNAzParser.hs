@@ -3,7 +3,8 @@
 -- | Parse RNAz output
 --   For more information on RNAz consult: <http://www.tbi.univie.ac.at/~wash/RN 
 module Bio.RNAzParser (
-                       getRNAzOutput,
+                       parseRNAz,
+                       getRNAzOutput,                                   
                        module Bio.RNAzData
                       ) where
 
