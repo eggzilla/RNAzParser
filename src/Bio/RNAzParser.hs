@@ -142,8 +142,8 @@ parseRNAzConsensus = do
   return $ RNAzConsensus consensusSequence dotBracket
          
 -- | parse RNAzOutput from input string
-getRNAzOutput input = parse parseRNAzOutput "parseRNAzOutput" input
+parseRNAzOutput input = parse parseRNAzOutput "parseRNAzOutput" input
 
 -- | parse from input filePath                      
-parseRNAz :: String -> IO (Either ParseError RNAzOutput)                  
-parseRNAz filePath = parseFromFile parseRNAzOutput filePath
+readRNAz :: String -> IO (Either ParseError RNAzOutput)                  
+readRNAz filePath = parseFromFile parseRNAzOutput filePath
