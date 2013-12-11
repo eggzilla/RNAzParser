@@ -4,7 +4,7 @@
 --   For more information on RNAz consult: <http://www.tbi.univie.ac.at/~wash/RN 
 module Bio.RNAzParser (
                        parseRNAz,
-                       getRNAzOutput,                                   
+                       readRNAz,                                   
                        module Bio.RNAzData
                       ) where
 
@@ -142,7 +142,7 @@ parseRNAzConsensus = do
   return $ RNAzConsensus consensusSequence dotBracket
          
 -- | parse RNAzOutput from input string
-parseRNAzOutput input = parse parseRNAzOutput "parseRNAzOutput" input
+parseRNAz input = parse parseRNAzOutput "parseRNAzOutput" input
 
 -- | parse from input filePath                      
 readRNAz :: String -> IO (Either ParseError RNAzOutput)                  
